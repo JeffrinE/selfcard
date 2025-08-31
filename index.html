@@ -1,0 +1,710 @@
+<!-- ==========================================================
+  GHOST/PSYCHIC TRAINER CARD – Carrd single-file embed
+  Credits required: Ethamine × Splicer
+  Notes:
+  • Replace SPRITE URLs in CSS/JS where noted.
+  • Everything is self-contained: no external libs.
+========================================================== -->
+<head>
+  <title>SELF.CARD</title>
+</head>
+<style>
+  /* ===============================
+     THEMATIC TOKENS (Ghost/Psychic)
+  =============================== */
+  :root{
+    --page:#0a0811;           /* deep void */
+    --void-1:#151026;         /* grid lines */
+    --fog:#c9b3ff20;          /* ambient haze */
+    --scan:#ffffff12;
+    --glow:#9b7bff33;         /* CRT/glimmer */
+    --accent:#a688ff;         /* lavender */
+    --accent-2:#37e1ff;       /* psychic teal */
+    --ink:#0d0b12;
+
+    /* Win98 face */
+    --face:#cfcdd6; --light:#fff; --mid:#e6e3ee; --dark:#7f7b8a; --shadow:#3a3646;
+
+    /* Titlebar (amethyst gradient) */
+    --tb1:#6e53f0; --tb2:#4b36ca; --tb-stripe:#00000022;
+
+    --card-w: 430px;          /* island width */
+    --panel-minh: 280px;
+  }
+
+  /* ===============================
+     BACKGROUND: grid + fog + stars
+  =============================== */
+  html,body{height:100%; margin:0; background:var(--page); color:#111;
+    font-family:Tahoma,"MS Sans Serif","Segoe UI",system-ui,sans-serif;
+    overflow:hidden; cursor:default;
+  }
+
+
+  .stage{position:relative;height:100dvh;width:100%;display:flex;align-items:center;justify-content:center;isolation:isolate}
+
+  /* Subtle grid drift */
+  .bg-grid{position:absolute; inset:0; z-index:-4;
+    background:
+      radial-gradient(1400px 1200px at 70% 28%, #140f22 0%, transparent 60%),
+      repeating-linear-gradient(90deg, var(--void-1) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(0deg,  var(--void-1) 0 1px, transparent 1px 28px);
+    animation: pan 48s linear infinite;
+  }
+  @keyframes pan{ to{ background-position:0 0, 680px 680px, -680px -680px } }
+
+  /* Lavender fog */
+  .fog{position:absolute;inset:-15%;z-index:-3;pointer-events:none;opacity:.55;
+    background:
+      radial-gradient(50% 40% at 30% 60%, #a78bff22 0 60%, transparent 61%),
+      radial-gradient(60% 45% at 70% 35%, #7f5fff1c 0 60%, transparent 61%),
+      radial-gradient(40% 35% at 50% 80%, #37e1ff14 0 60%, transparent 61%);
+    filter: blur(14px);
+    animation: fogslide 30s ease-in-out infinite alternate;
+  }
+  @keyframes fogslide{
+    from{ transform: translate(-2%,1%) scale(1) }
+    to  { transform: translate(2%,-1%) scale(1.04) }
+  }
+
+  /* Occult star specks */
+  .stars{position:absolute;inset:0;pointer-events:none;z-index:-2;opacity:.08;background:
+    radial-gradient(circle at 10% 20%, #fff 0 1px, transparent 2px) 0 0/120px 120px,
+    radial-gradient(circle at 80% 60%, #fff 0 1px, transparent 2px) 0 0/180px 180px,
+    radial-gradient(circle at 35% 75%, #fff 0 1px, transparent 2px) 0 0/220px 220px;
+    animation: stars 60s linear infinite}
+  @keyframes stars{to{transform:translate(-40px,-28px)}}
+
+  /* CRT scanline */
+  .scan{position:absolute;inset:0;z-index:-1;pointer-events:none;
+    background:linear-gradient(0deg,transparent 50%,var(--scan) 50%);
+    background-size:100% 2px; mix-blend-mode:screen; animation:scan 8s steps(2,end) infinite}
+  @keyframes scan{0%,100%{opacity:.22}40%{opacity:.16}60%{opacity:.28}80%{opacity:.2}}
+
+  /* ===============================
+     WIN98 WINDOW (Trainer Card Shell)
+  =============================== */
+  .win{
+    width:var(--card-w); max-width:94vw; background:var(--face);
+    border:2px solid var(--mid); border-radius:6px;
+    box-shadow:
+      inset 1px 1px var(--light), inset -1px -1px var(--shadow),
+      inset 2px 2px var(--mid), inset -2px -2px var(--dark),
+      6px 6px 0 #0009, 0 0 28px 10px var(--glow);
+    overflow:hidden; position:relative; transform:translateZ(0);
+    animation: awaken .42s ease-out both;
+  }
+  @keyframes awaken{from{opacity:0; transform:scale(.97) translateY(12px)}to{opacity:1; transform:scale(1) translateY(0)}}
+
+  .titlebar{
+    height:26px;display:flex;align-items:center;justify-content:space-between;padding:4px 6px;user-select:none;position:relative;color:#fff;
+    background:
+      linear-gradient(var(--tb1),var(--tb2)),
+      repeating-linear-gradient(135deg,transparent 0 10px,var(--tb-stripe) 10px 20px);
+    text-shadow:0 1px 0 #000; letter-spacing:.2px
+  }
+  .titlebar .title{font-weight:700}
+  .tb-controls{display:flex;gap:4px}
+  .ctl{width:18px;height:16px;display:grid;place-items:center;background:var(--face);border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark); transition:transform .08s, filter .08s}
+  .ctl:hover{filter:brightness(1.05)}
+  .ctl:active{box-shadow:inset 1px 1px var(--dark), inset -1px -1px var(--light); transform:translateY(1px)}
+  .ctl svg{width:11px;height:11px;fill:#000}
+
+  .menubar{display:flex;gap:10px;padding:4px 8px;background:#efefef;font-size:12px;border-bottom:2px solid var(--mid);
+    box-shadow:inset 0 1px var(--light), inset 0 -1px var(--dark)}
+  .menu{position:relative}
+  .menu>button{background:#efefef;border:2px solid var(--mid);padding:2px 8px;font-size:12px;
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark)}
+  .menu>button:hover{filter:brightness(1.04)}
+  .dropdown{position:absolute;top:24px;left:0;min-width:190px;display:none;z-index:40;background:#fff;border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--shadow), 4px 4px 0 #0003}
+  .dropdown.active{display:block;animation:drop .12s ease-out}
+  @keyframes drop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .dropdown button{width:100%;text-align:left;background:transparent;border:0;padding:6px 10px;font-size:12px}
+  .dropdown button:hover{background:#e6e6e6}
+
+  .inner{padding:10px;display:flex;flex-direction:column;gap:10px}
+
+  /* ===============================
+     CARD HEADER (Holo + Trainer block)
+  =============================== */
+  .card-head{
+    position:relative; background:#fff; padding:10px; border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--shadow), inset 2px 2px var(--mid), inset -2px -2px var(--dark);
+    overflow:hidden;
+  }
+  /* Holo-foil sheen */
+  .card-head::after{
+    content:""; position:absolute; inset:-40%;
+    background:
+      conic-gradient(from 180deg at 50% 50%, #ff9ffb22, #8af3ff22, #e9ff8c22, #ff9ffb22),
+      linear-gradient(45deg, transparent 40%, #ffffff40 50%, transparent 60%);
+    mix-blend-mode: screen; pointer-events:none; animation:foil 8s linear infinite;
+  }
+  @keyframes foil{ to{ transform: rotate(360deg) scale(1.06)} }
+
+  .trainer{
+    display:flex; gap:10px; align-items:center;
+  }
+  .sprite-wrap{ width:84px; height:84px; flex:none; perspective:600px }
+  .sprite-card{ width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform .45s }
+  .sprite-wrap:hover .sprite-card{ transform: rotateY(180deg) }
+  .sprite-side{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark);
+    background:#eee center/cover no-repeat;
+    background-image:url('https://avatars.githubusercontent.com/u/141047292?v=4');
+    image-rendering: pixelated;
+  }
+  .sprite-side.back{ transform: rotateY(180deg); display:grid; place-items:center; font-size:11px; padding:6px;
+    background:repeating-linear-gradient(45deg,#f7f5ff 0 6px,#efeaff 6px 12px) }
+
+  .id{
+    min-width:0;
+  }
+  .name{ font-weight:800; font-size:15px; letter-spacing:.3px; margin-bottom:2px; }
+  .tagline{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:2px 8px; border:1px solid #000; border-radius:10px; background:#fff;
+  }
+  .type-badges{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px }
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:2px 8px; border:1px solid #000; border-radius:8px;
+    background:#f7f7f7; box-shadow:1px 1px 0 #0002, inset 1px 1px #fff, inset -1px -1px #999;
+  }
+  .i-ghost,.i-psychic, .i-gamedev{
+    width:12px;height:12px;border-radius:3px;display:inline-block;
+    box-shadow:inset 0 0 0 1px #0003;
+  }
+  .i-ghost{ background:linear-gradient(180deg,#6c59d6,#3b2c9c) }
+  .i-psychic{ background:linear-gradient(180deg,#ff66b3,#b4308a) }
+  .i-gamedev{ background:linear-gradient(180deg, #478cbf , #414042)}
+
+  .ribbon{ position:relative; height:18px; background:#efefef; border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark); overflow:hidden }
+  .ribbon span{ position:absolute; white-space:nowrap; left:100%; top:0; line-height:16px; padding:0 10px; font-size:12px; animation:marq 16s linear infinite }
+  @keyframes marq{ to{ transform: translateX(-140%) } }
+
+  /* ===============================
+     TAB STRIP
+  =============================== */
+  .tabs{ display:flex; gap:6px; flex-wrap:wrap }
+  .tab{ position:relative; display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:4px 10px; background:#efefef; border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark), 0 0 0 1px #00000012; cursor:pointer; overflow:hidden }
+  .tab:hover{ filter: brightness(1.05) }
+  .tab.active{ box-shadow:inset 1px 1px var(--dark), inset -1px -1px var(--light), 0 0 0 1px #00000012; background:#deddea }
+  .tab .rip{ position:absolute; border-radius:50%; transform:scale(0); background:radial-gradient(circle, var(--accent-2) 0, transparent 60%); opacity:.5; pointer-events:none; aspect-ratio:1/1; animation:ripple .36s ease-out forwards }
+  @keyframes ripple{ to{ transform:scale(8); opacity:0 } }
+
+  /* ===============================
+     PANELS + SCROLLBOXES
+  =============================== */
+  .panels{ position:relative; min-height:var(--panel-minh); background:#fff; border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--shadow), inset 2px 2px var(--mid), inset -2px -2px var(--dark); overflow:hidden }
+  .panel{ position:absolute; inset:0; padding:8px; opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .18s ease, transform .18s ease }
+  .panel.active{ opacity:1; transform:translateY(0); pointer-events:auto; position:relative }
+
+  .scrollbox{ height:205px; overflow:auto; background:#fff; padding:8px; font-size:12px; line-height:1.45; color:#111; border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark), inset 2px 2px var(--mid), inset -2px -2px var(--dark) }
+  .scrollbox::-webkit-scrollbar{ width:14px; background:#d9d5e4 }
+  .scrollbox::-webkit-scrollbar-track{ background:#d9d5e4; border-left:1px solid var(--mid); box-shadow: inset 1px 1px var(--light), inset -1px -1px var(--dark) }
+  .scrollbox::-webkit-scrollbar-thumb{ background:#efecf7; border:2px solid #d9d5e4; box-shadow: inset 1px 1px var(--light), inset -1px -1px var(--dark) }
+  .scrollbox::-webkit-scrollbar-thumb:hover{ background:#f6f4ff }
+
+  /* Utility */
+  .col2{ display:flex; gap:8px; flex-wrap:wrap }
+  .box{ flex:1 1 170px; background:#fff; border:2px solid var(--mid); padding:6px; box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark) }
+  .box h4{ margin:0 0 6px 0; font-size:12px }
+
+  dl{ display:grid; grid-template-columns:auto 1fr; gap:4px 8px; margin:0 }
+  dt{ font-weight:700 } dd{ margin:0 }
+
+  /* Bars */
+  .meter{ height:12px; border:2px solid var(--mid); background:#eee; box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark) }
+  .meter > i{ display:block; height:100%; background:linear-gradient(90deg,#6a57e8,#24d6ff); box-shadow:inset 0 0 0 1px #0001 }
+
+  /* PARTY GRID */
+  .party{ display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:6px }
+  .mon{
+    background:#faf9ff; border:2px solid var(--mid); padding:6px; display:grid; grid-template-columns:44px 1fr; gap:6px;
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark)
+  }
+  .mon .s{ width:44px;height:44px; background:#eee center/cover no-repeat; image-rendering:pixelated; border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark) }
+  .mon .n{ font-weight:700; }
+  .hp{ height:10px; border:2px solid var(--mid); background:#f1eefb; box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark) }
+  .hp > i{ display:block; height:100%; background:linear-gradient(90deg,#00dd7b,#34ffc8) }
+  .exp{ height:8px; border:1px solid #b7b2c8; background:#ebe8f6; margin-top:2px }
+  .exp > i{ display:block; height:100%; background:linear-gradient(90deg,#6a57e8,#24d6ff) }
+
+  /* FILTERS (types) */
+  .filters{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px }
+  .filter{ font-size:12px; padding:2px 8px; background:#efefef; border:2px solid var(--mid); box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark); cursor:pointer }
+  .filter.active{ box-shadow:inset 1px 1px var(--dark), inset -1px -1px var(--light); background:#dbdbdb }
+
+  /* MOVES */
+  .move{ background:#f7f6ff; border:2px solid var(--mid); padding:6px; box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark); margin-bottom:6px }
+  .move .row{ display:flex; justify-content:space-between; font-weight:700 }
+  .pp{ height:8px; border:1px solid #b7b2c8; background:#ebe8f6; }
+  .pp > i{ display:block; height:100%; background:linear-gradient(90deg,#ff6ad5,#ffb3ea) }
+
+  /* GEAR (Bag) */
+  .bag-tabs{ display:flex; gap:6px; margin-bottom:6px; flex-wrap:wrap }
+  .bag-tab{ font-size:12px; padding:2px 8px; background:#efefef; border:2px solid var(--mid); box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark); cursor:pointer }
+  .bag-tab.active{ box-shadow:inset 1px 1px var(--dark), inset -1px -1px var(--light); background:#dbdbdb }
+  .item{ display:flex; justify-content:space-between; gap:10px; padding:6px; background:#fff; border:2px solid var(--mid); margin-bottom:6px; box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark) }
+  .item .k{ font-weight:700 }
+
+  /* LINKS + 88x31 */
+  .w98-btn{ display:inline-block; padding:4px 10px; font-size:12px; margin:0 6px 6px 0; text-decoration:none; color:#000; background:#efefef; border:2px solid var(--mid);
+    box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark), 0 0 0 1px #00000012 }
+  .w98-btn:hover{ filter:brightness(1.05) }
+
+  /* LIGHTBOX */
+  .lightbox{ position:fixed; inset:0; background:#000c; display:none; align-items:center; justify-content:center; z-index:60 }
+  .lightbox.active{ display:flex }
+  .lb-img{ max-width:88vw; max-height:80vh; border:2px solid var(--mid); background:#000; box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark), 8px 8px 0 #000a }
+  .lb-nav{ position:fixed; bottom:26px; display:flex; gap:8px }
+  .lb-btn{ padding:6px 10px; background:#efefef; border:2px solid var(--mid); box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark); font-size:12px }
+  .lb-btn:hover{ filter:brightness(1.05) }
+
+  /* FOOTER */
+  .foot{ display:flex; align-items:center; justify-content:space-between; font-size:11px; background:#efefef; padding:6px 8px; margin-top:-2px; border-top:2px solid var(--mid);
+    box-shadow:inset 0 1px var(--light), inset 0 -1px var(--dark) }
+  .foot a{ color:#2a57ff; text-decoration:none } .foot a:hover{ text-decoration:underline }
+
+  .win:hover{ box-shadow:
+      inset 1px 1px var(--light), inset -1px -1px var(--shadow),
+      inset 2px 2px var(--mid), inset -2px -2px var(--dark),
+      6px 6px 0 #0009, 0 0 36px 12px var(--glow) }
+
+  @media (max-height:620px){ .win{ transform: scale(.96) } }
+</style>
+
+<div class="stage">
+  <div class="bg-grid"></div>
+  <div class="fog"></div>
+  <div class="stars"></div>
+  <div class="scan"></div>
+
+  <section class="win" id="window" role="dialog" aria-label="">
+    <!-- Titlebar -->
+    <div class="titlebar" id="drag-handle" title="">
+      <div class="title">SELF.CARD</div>
+      <div class="tb-controls">
+        <div class="ctl" id="btn-min" title="Minimize"><svg viewBox="0 0 12 12"><rect x="2" y="8" width="8" height="1"/></svg></div>
+        <div class="ctl" id="btn-max" title="Center"><svg viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="#000" stroke-width="1"/></svg></div>
+        <div class="ctl" id="btn-close" title="Close"><svg viewBox="0 0 12 12"><path d="M3 3 L9 9 M9 3 L3 9" stroke="#000" stroke-width="1.6"/></svg></div>
+      </div>
+    </div>
+
+    <!-- Menubar -->
+    <div class="menubar">
+      <div class="menu">
+        <button data-menu="file">File ▾</button>
+        <div class="dropdown" id="menu-file">
+        </div>
+      </div>
+      <div class="menu">
+        <button data-menu="view">View ▾</button>
+        <div class="dropdown" id="menu-view">
+        </div>
+      </div>
+      <div class="menu">
+        <button data-menu="help">Help ▾</button>
+        <div class="dropdown" id="menu-help">
+        </div>
+      </div>
+    </div>
+
+    <div class="inner">
+      <!-- Card Header with holo -->
+      <div class="card-head">
+        <div class="trainer">
+          <div class="sprite-wrap">
+            <div class="sprite-card">
+              <div class="sprite-side front"></div>
+              <div class="sprite-side back">JeffrinE</div>
+            </div>
+          </div>
+          <div class="id">
+            <div class="name">Jeffrin E // Student</div>
+            <div class="tagline">ID: <b>#044</b> • region: <b>chennai</b> • status: <b><span id="activityStatus">active</span></b></div>
+            <div class="type-badges">
+              <span class="badge"><i class="i-ghost"></i> AIML</span>
+              <span class="badge"><i class="i-psychic"></i> CyberSec</span>
+              <span class="badge"><i class="i-gamedev"></i> GameDev</span>
+              <!-- <span class="badge">mind reader</span> -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ribbon -->
+      <div class="ribbon"><span> ヾ(•ω•`)o • you're not lost, you're 19 • No regrets. Just do better next time • being insecure is a waste of youth. nobody is above you • offline is the new luxury • ¯\_(ツ)_/¯</span></div>
+
+      <!-- Tabs -->
+      <nav class="tabs" role="tablist" aria-label="tab section">
+        <button class="tab active" data-tab="stats" role="tab" aria-selected="true">stats</button>
+        <button class="tab" data-tab="moves" role="tab" aria-selected="false">skills</button>
+        <button class="tab" data-tab="gear" role="tab" aria-selected="false">tools</button>
+        <button class="tab" data-tab="links" role="tab" aria-selected="false">links</button>
+      </nav>
+
+      <!-- Panels -->
+      <div class="panels" id="panels">
+        <!-- STATS -->
+        <section class="panel active" id="stats" role="tabpanel">
+          <div class="scrollbox">
+            <div class="col2">
+              <div class="box">
+                <h4>STATS</h4>
+                <dl>
+                  <dt>specialization</dt><dd>Threat Intelligence / OSINT</dd>
+                  <dt>class</dt><dd>Junior Analyst</dd>
+                  <dt>timezone</dt><dd>IST — UTC+05:30</dd>
+                </dl>
+              </div>
+              <!-- <div class="box">
+                <h4>special stats</h4>
+                clairvoyance <div class="meter"><i style="width:92%"></i></div>
+                ritual logic <div class="meter"><i style="width:88%"></i></div>
+                ui sorcery <div class="meter"><i style="width:90%"></i></div>
+                signal craft <div class="meter"><i style="width:78%"></i></div>
+              </div> -->
+            </div>
+            <br>
+            <div class="col2">
+              <div class="box">
+                <h4>notes</h4>
+                Intermediate AI/ML and cybersecurity professional with experience in threat intelligence and game development.
+              </div>
+              <div class="box">
+                <h4>widgets</h4>
+                local time: <span id="locTime">--:--</span><br>
+                <!-- moon phase: <span id="moon">calculating…</span><br> -->
+                
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PARTY -->
+        <section class="panel" id="party" role="tabpanel">
+          <div class="scrollbox">
+            <div class="filters">
+              <button class="filter active" data-t="all">all</button>
+              <button class="filter" data-t="ghost">ghost</button>
+              <button class="filter" data-t="psychic">psychic</button>
+              <button class="filter" data-t="dark">dark</button>
+            </div>
+            <div class="party" id="partyGrid">
+              <!-- Filled by JS: see party[] data -->
+            </div>
+          </div>
+        </section>
+
+        <!-- MOVES -->
+        <section class="panel" id="moves" role="tabpanel">
+          <div class="scrollbox" id="movesBox">
+            <!-- Filled by JS from moves[] -->
+          </div>
+        </section>
+
+        <!-- GEAR -->
+        <section class="panel" id="gear" role="tabpanel">
+          <div class="scrollbox">
+            <div class="bag-tabs">
+              <button class="bag-tab active" data-bag="consumables">tools</button>
+              <button class="bag-tab" data-bag="tech">tech</button>
+            </div>
+            <div id="bagList"><!-- JS fills items --></div>
+          </div>
+        </section>
+
+        <!-- LINKS -->
+        <section class="panel" id="links" role="tabpanel">
+          <div class="scrollbox">
+            <a class="w98-btn" href="https://www.linkedin.com/in/jeffrine" target="_blank" rel="noopener">linkedin</a>
+            <a class="w98-btn" href="https://github.com/JeffrinE" target="_blank" rel="noopener">github</a>
+            <a class="w98-btn" href="https://jeffrin.itch.io" target="_blank" rel="noopener">itchio</a>
+            <h4>Projects</h4>
+            <div id="linkList"><!-- JS fills items --></div>
+          </div>
+        </section>
+
+      <div class="foot">
+        <div>status: <b style="color:var(--accent)"><span id="activityStatusFoot">active</span></b> • <span id="footClock">--:--</span></div>
+        <div><a href="https://github.com/numbpill3d/ghostccard" title="theme by ethamine × splicer">theme by ethamine × splicer</a></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<script>
+/* ==========================================================
+   INTERACTION + DATA
+========================================================== */
+(function(){
+  const $ = (q,ctx=document)=>ctx.querySelector(q);
+  const $$ = (q,ctx=document)=>Array.from(ctx.querySelectorAll(q));
+
+  /* ---------- CLOCKS / MOON / KEYS ---------- */
+  const footClock = $('#footClock'), locTime = $('#locTime'), lastKey = $('#lastKey'), moonEl = $('#moon');
+  function pad(n){ return (''+n).padStart(2,'0'); }
+  function clock(){
+    const d=new Date(); const t=`${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    if(footClock) footClock.textContent=t; if(locTime) locTime.textContent=t;
+  }
+  setInterval(clock, 1000); clock();
+  document.addEventListener('keydown', e=>{ if(lastKey) lastKey.textContent = e.key.length===1? e.key : e.key; });
+
+  // quick n-phase approximation (0..29.53)
+  function moonPhase(){
+    const now=new Date();
+    const syn=29.53058867;
+    const known=new Date(Date.UTC(2001,0,1,0,0,0)); // near new moon reference
+    const days=(now-known)/86400000;
+    const phase=days % syn;
+    const idx=Math.floor((phase/syn)*8+0.5)%8;
+    const names=['new','waxing crescent','first quarter','waxing gibbous','full','waning gibbous','last quarter','waning crescent'];
+    return names[idx];
+  }
+  if(moonEl) moonEl.textContent = moonPhase();
+
+
+  /* ---------- activity status ---------- */
+// Get current UTC date and time in ISO format
+const activityStatus = $('#activityStatus');
+const activityStatusFoot = $('#activityStatusFoot')
+const currentUTC = new Date().toISOString(); // e.g. "2025-08-31T16:24:12.123Z"[3]
+
+// Fetch last updated UTC time from GitHub API (example with fetch API)
+fetch('https://api.github.com/users/jeffrine')
+  .then(response => response.json())
+  .then(data => {
+    const lastUpdated = data.updated_at; // e.g. "2025-08-25T15:20:09Z"
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const daysDiff = Math.floor(
+      (new Date(currentUTC) - new Date(lastUpdated)) / msPerDay
+    );
+    const status = (daysDiff <= 12) ? 'active' : 'offline';
+    console.log(status);
+    activityStatus.textContent = status;
+    activityStatusFoot.textContent = status;
+  });
+
+
+  /* ---------- TABS (ripple + crossfade) ---------- */
+  const tabs=$$('.tab'); const panels=$$('.panel');
+  function activate(id){
+    tabs.forEach(t=>{ const on=t.dataset.tab===id; t.classList.toggle('active',on); t.setAttribute('aria-selected', on); });
+    panels.forEach(p=>{ const on=p.id===id; p.classList.toggle('active',on); p.style.zIndex = on?2:1; });
+    try{ sessionStorage.setItem('ghostdex-tab', id) }catch(e){}
+  }
+  function ripple(e,btn){
+    const r=document.createElement('span'); r.className='rip';
+    const rect=btn.getBoundingClientRect(); const size=Math.max(rect.width,rect.height);
+    r.style.width=r.style.height=size+'px';
+    r.style.left=(e.clientX-rect.left-size/2)+'px';
+    r.style.top =(e.clientY-rect.top-size/2)+'px';
+    btn.appendChild(r); setTimeout(()=>r.remove(),420);
+  }
+  tabs.forEach(t=> t.addEventListener('click', e=>{ ripple(e,t); activate(t.dataset.tab); }));
+  document.addEventListener('keydown', e=>{
+    if(e.key==='[' || e.key===']'){
+      e.preventDefault();
+      const idx=tabs.findIndex(t=>t.classList.contains('active'));
+      const ni = e.key==='[' ? (idx-1+tabs.length)%tabs.length : (idx+1)%tabs.length;
+      activate(tabs[ni].dataset.tab);
+    }
+  });
+  try{ const saved=sessionStorage.getItem('ghostdex-tab'); if(saved && $('#'+saved)) activate(saved); }catch(e){}
+
+  /* ---------- PARTY / MOVES / GEAR DATA ---------- */
+  const moves = [
+    {name:'Python/JS/Java', power:85, acc:'100%', type:'PG lang', desc:'Python - Professional, JS - Intermediate, Java - Intermediate'},
+    {name:'AWS', power:50, acc:'75%', type:'Cloud', desc:''},
+    {name:'Digital Forensics', power:'50', type:'CyberSec', desc:''},
+    {name:'Game Development', power:75, type:'', desc:'experience with 2D mini games'},
+    {name:'AIML', power:90, acc:'100%', type:'AI', desc:'has experience with model training and validation'}
+
+  ];
+
+  const bag = {
+    consumables: [
+      {k:'Nginx'}, {k:'Docker'}, {k:'Godot'},
+      {k:'SQL'}, {k:'LLM/Langchain'}
+    ],
+    tech: [
+      {k:'RaspberryPI', v:'linked'}, {k:'Arduino/ESP32', v:'paired'}
+    ],
+
+
+  };
+
+
+  /* ---------- MOVES RENDER ---------- */
+  const movesBox = $('#movesBox');
+  function renderMoves(){
+    movesBox.innerHTML = '';
+    moves.forEach(m=>{
+      const wrap=document.createElement('div'); wrap.className='move';
+      wrap.innerHTML = `
+        <div class="row">
+          <div>${m.name} — <i style="text-transform:uppercase">${m.type}</i></div>
+          <div>• XP ${m.power}</div>
+        </div>
+        <div style="font-size:11px;color:#333;margin:3px 0 6px 0">${m.desc}</div>
+        <div class="pp"><i style="width:${Math.round(m.power)}%"></i></div>`;
+      movesBox.appendChild(wrap);
+    });
+  }
+  renderMoves();
+
+  /* ----------  (skills) ---------- */
+  const bagList = $('#bagList');
+  function renderBag(cat){
+    bagList.innerHTML='';
+    (bag[cat]||[]).forEach(i=>{
+      const row=document.createElement('div'); row.className='item';
+      row.innerHTML = `<div class="k">${i.k}</div>`;
+      bagList.appendChild(row);
+    });
+  }
+  renderBag('consumables');
+  $$('.bag-tab').forEach(b=> b.addEventListener('click', ()=>{
+    $$('.bag-tab').forEach(x=>x.classList.toggle('active', x===b));
+    renderBag(b.dataset.bag);
+  }));
+
+  /* ---------- PROKECT LINKS ---------- */
+const repoList = $('#linkList'); // Container element
+
+async function renderRepos() {
+  repoList.innerHTML = ''; // Clear the container
+  const res = await fetch('https://api.github.com/users/JeffrinE/repos?sort=stars&direction=asc');
+  const data = await res.json();
+  console.log(data)
+  data.forEach(repo => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `<dt><a href="${repo.html_url}" style="text-decoration:none" target="_blank">${repo.name}</a></dt><dd>⭐${repo.stargazers_count}</dd>`;
+    repoList.appendChild(row);
+  });
+}
+
+renderRepos();
+
+  /* ---------- LINKS helpers ---------- */
+  $('#copySnip')?.addEventListener('click', ()=>{
+    const txt=$('#snip').innerText; navigator.clipboard?.writeText(txt); alert('snippet copied');
+  });
+
+
+
+  // Minimize/Dock
+  const btnMin=$('#btn-min'), btnMax=$('#btn-max'), btnClose=$('#btn-close');
+  let minimized=false, dock=null;
+  function createDock(){
+    if(dock) return;
+    dock=document.createElement('div');
+    dock.style.cssText=`position:fixed;bottom:12px;left:50%;transform:translateX(-50%);
+      background:#efefef;color:#000;font-size:12px;padding:6px 10px;border:2px solid var(--mid);
+      box-shadow:inset 1px 1px var(--light), inset -1px -1px var(--dark), 6px 6px 0 #0008; z-index:80`;
+    dock.textContent='SELF.CARD [restore]';
+    document.body.appendChild(dock);
+    dock.addEventListener('click', ()=>{ minimized=false; win.style.display=''; dock.remove(); dock=null; centerWindow(); });
+  }
+  btnMin.addEventListener('click', ()=>{ if(!minimized){ minimized=true; win.style.transition='opacity .18s'; win.style.opacity='0'; setTimeout(()=>{win.style.opacity=''; win.style.display='none'; createDock();}, 180); }});
+  btnMax.addEventListener('click', ()=>centerWindow());
+  btnClose.addEventListener('click', ()=>{ win.style.transition='transform .25s, opacity .25s'; win.style.transform='translate(-6px,0) rotate(-0.8deg)'; win.style.opacity='0';
+    setTimeout(()=>{ win.style.transform='translate(0,0)'; win.style.opacity='1'; }, 320); });
+
+      /* ---------- DRAGGABLE WINDOW & MENUS ---------- */
+  const win=$('#window'), handle=$('#drag-handle');
+  function centerWindow(){ win.style.transform='translate(0px,0px)'; }
+  let dragging=false, dx=0, dy=0;
+  function currentOrigin(){
+    const m=getComputedStyle(win).transform; if(!m || m==='none') return {x:0,y:0};
+    const v=m.match(/matrix\\(([^)]+)\\)/); if(v){ const a=v[1].split(',').map(Number); return {x:a[4]||0,y:a[5]||0}; }
+    return {x:0,y:0};
+  }
+  function bounds(x,y){
+    const st=$('.stage').getBoundingClientRect(), r=win.getBoundingClientRect(), pad=12;
+    const minX=st.left+pad, minY=st.top+pad, maxX=st.right-r.width-pad, maxY=st.bottom-r.height-pad;
+    return {x:Math.min(Math.max(x,minX),maxX), y:Math.min(Math.max(y,minY),maxY)};
+  }
+  const onDown = e=>{
+    if(e.button!==0) return; dragging=true;
+    const o=currentOrigin(); const cx=(e.touches?e.touches[0].clientX:e.clientX), cy=(e.touches?e.touches[0].clientY:e.clientY);
+    dx=cx-o.x; dy=cy-o.y;
+    document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove,{passive:false}); document.addEventListener('touchend', onUp);
+  };
+  const onMove = e=>{
+    if(!dragging) return; e.preventDefault();
+    const cx=(e.touches?e.touches[0].clientX:e.clientX), cy=(e.touches?e.touches[0].clientY:e.clientY);
+    const t=bounds(cx-dx, cy-dy);
+    win.style.transform=`translate(${t.x-(window.innerWidth-win.offsetWidth)/2}px, ${t.y-(window.innerHeight-win.offsetHeight)/2}px)`;
+  };
+  const onUp=()=>{ dragging=false; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp); };
+  handle.addEventListener('mousedown', onDown); handle.addEventListener('touchstart', onDown,{passive:true});
+
+  // Menus
+  const menus=$$('.menu>button'); menus.forEach(b=> b.addEventListener('click', ()=>{
+    const id='menu-'+b.dataset.menu;
+    $$('.dropdown').forEach(d=>d.classList.toggle('active', d.id===id && !d.classList.contains('active')));
+    $('#'+id).classList.toggle('active');
+  }));
+  document.addEventListener('click', e=>{ if(!e.target.closest('.menu')) $$('.dropdown').forEach(d=>d.classList.remove('active')); });
+
+  // Menu actions
+  const fog=$('.fog');
+  document.querySelectorAll('.dropdown button').forEach(btn=> btn.addEventListener('click', ()=>{
+    const act=btn.dataset.act;
+    if(act==='new-note'){ activate('journal'); $('#nText').focus(); }
+    if(act==='heal'){ healParty(); }
+    if(act==='toggle-fog'){ fog.style.display = (fog.style.display==='none'?'':'none'); }
+    if(act==='crt'){ document.body.classList.toggle('spirit'); }
+    if(act==='center'){ centerWindow(); }
+    if(act==='shrink'){ win.style.width='380px'; }
+    if(act==='grow'){ win.style.width='480px'; }
+    $$('.dropdown').forEach(d=>d.classList.remove('active'));
+  }));
+
+
+  // Konami => Spirit Mode (CRT/heavy glow)
+  const seq=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']; let buf=[];
+  document.addEventListener('keydown', e=>{ buf.push(e.key); buf=buf.slice(-seq.length); if(seq.every((k,i)=>buf[i]===k)){ document.body.classList.toggle('spirit'); buf=[]; } });
+
+  // Restore last tab
+  try{ const saved=sessionStorage.getItem('ghostdex-tab'); if(saved && $('#'+saved)) activate(saved); }catch(e){}
+
+  // Helper: open gallery lightbox by URL
+  function openLBFromURL(url){
+    const lb=$('#lightbox'), lbImg=$('#lbImg');
+    lbImg.src=url; lb.classList.add('active'); lb.setAttribute('aria-hidden','false');
+  }
+  window.openLBFromURL = openLBFromURL;
+
+  // Inject Spirit Mode CSS
+  const spirit=document.createElement('style');
+  spirit.textContent = `
+    .spirit .win{
+      box-shadow:
+        inset 1px 1px var(--light), inset -1px -1px var(--shadow),
+        inset 2px 2px var(--mid), inset -2px -2px var(--dark),
+        6px 6px 0 #000a, 0 0 60px 18px #8f7bff44, 0 0 120px 30px #37e1ff22;
+    }
+    .spirit .scan{ opacity:.32 }
+  `;
+  document.head.appendChild(spirit);
+
+  // initial center
+  centerWindow();
+})();
+</script>
